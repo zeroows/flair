@@ -94,9 +94,9 @@ trainer.train('resources/taggers/example-ner',
 **88.27** F1-score, averaged over 5 runs.
 
 #### Data
-Get the [CoNLL-03 data set for German](https://www.clips.uantwerpen.be/conll2003/ner/).
+Get the [CoNLL-03 data set for German](https://www.clips.uantwerpen.be/conll2003/ner/)
 It contains 4 entity classes. Follows the steps on the task Web site to
-get the dataset and place train, test and dev data in `resources/tasks/conll_03-ger/` as follows:
+get the dataset. Please note that there are two versions of this dataset: the original and a 2006 revision that makes some tags more consistent. We always use the 2006 version in our experiments. Once you've generated the corpus, place train, test and dev data in `resources/tasks/conll_03-ger/` as follows:
 
 ```
 resources/tasks/conll_03-ger/deu.testa
@@ -182,8 +182,8 @@ tag_dictionary = corpus.make_tag_dictionary(tag_type=tag_type)
 # initialize embeddings
 embedding_types: List[TokenEmbeddings] = [
     WordEmbeddings('nl'),
-    PooledFlairEmbeddings('dutch-forward', pool='mean'),
-    PooledFlairEmbeddings('dutch-backward', pool='mean'),
+    PooledFlairEmbeddings('dutch-forward', pooling='mean'),
+    PooledFlairEmbeddings('dutch-backward', pooling='mean'),
 ]
 
 embeddings: StackedEmbeddings = StackedEmbeddings(embeddings=embedding_types)

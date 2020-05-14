@@ -15,7 +15,7 @@ import flair.nn
 from flair.data import Dictionary, Sentence, Token, Label, space_tokenizer
 from flair.datasets import SentenceDataset, StringDataset
 from flair.embeddings import TokenEmbeddings
-from flair.file_utils import cached_path
+from flair.file_utils import cached_path, unzip_file
 from flair.training_utils import Metric, Result, store_embeddings
 
 log = logging.getLogger("flair")
@@ -112,6 +112,11 @@ class SequenceTagger(flair.nn.Model):
 
         # set the dictionaries
         self.tag_dictionary: Dictionary = tag_dictionary
+        # if we use a CRF, we must add special START and STOP tags to the dictionary
+        if use_crf:
+            self.tag_dictionary.add_item(START_TAG)
+            self.tag_dictionary.add_item(STOP_TAG)
+
         self.tag_type: str = tag_type
         self.tagset_size: int = len(tag_dictionary)
 
@@ -467,8 +472,8 @@ class SequenceTagger(flair.nn.Model):
                     outfile.write("".join(lines))
 
             detailed_result = (
-                f"\nMICRO_AVG: acc {metric.micro_avg_accuracy()} - f1-score {metric.micro_avg_f_score()}"
-                f"\nMACRO_AVG: acc {metric.macro_avg_accuracy()} - f1-score {metric.macro_avg_f_score()}"
+                f"\nMICRO_AVG: acc {metric.micro_avg_accuracy():.4f} - f1-score {metric.micro_avg_f_score():.4f}"
+                f"\nMACRO_AVG: acc {metric.macro_avg_accuracy():.4f} - f1-score {metric.macro_avg_f_score():.4f}"
             )
             for class_name in metric.get_classes():
                 detailed_result += (
@@ -481,7 +486,7 @@ class SequenceTagger(flair.nn.Model):
 
             result = Result(
                 main_score=metric.micro_avg_f_score(),
-                log_line=f"{metric.precision()}\t{metric.recall()}\t{metric.micro_avg_f_score()}",
+                log_line=f"{metric.precision():.4f}\t{metric.recall():.4f}\t{metric.micro_avg_f_score():.4f}",
                 log_header="PRECISION\tRECALL\tF1",
                 detailed_results=detailed_result,
             )
@@ -1008,10 +1013,41 @@ class SequenceTagger(flair.nn.Model):
         model_map["nl-ner"] = "/".join(
             [aws_resource_path_v04, "NER-conll2002-dutch", "nl-ner-conll02-v0.1.pt"]
         )
+        model_map["ml-pos"] = "https://raw.githubusercontent.com/qburst/models-repository/master/FlairMalayalamModels/malayalam-upos-model.pt"
+        model_map["ml-xpos"] = "https://raw.githubusercontent.com/qburst/models-repository/master/FlairMalayalamModels/malayalam-xpos-model.pt"
 
         cache_dir = Path("models")
         if model_name in model_map:
             model_name = cached_path(model_map[model_name], cache_dir=cache_dir)
+
+        # the historical German taggers by the @redewiegergabe project
+        if model_name == "de-historic-indirect":
+            model_file = Path(flair.cache_root)  / cache_dir / 'indirect' / 'final-model.pt'
+            if not model_file.exists():
+                cached_path('http://www.redewiedergabe.de/models/indirect.zip', cache_dir=cache_dir)
+                unzip_file(Path(flair.cache_root)  / cache_dir / 'indirect.zip', Path(flair.cache_root)  / cache_dir)
+            model_name = str(Path(flair.cache_root)  / cache_dir / 'indirect' / 'final-model.pt')
+
+        if model_name == "de-historic-direct":
+            model_file = Path(flair.cache_root)  / cache_dir / 'direct' / 'final-model.pt'
+            if not model_file.exists():
+                cached_path('http://www.redewiedergabe.de/models/direct.zip', cache_dir=cache_dir)
+                unzip_file(Path(flair.cache_root)  / cache_dir / 'direct.zip', Path(flair.cache_root)  / cache_dir)
+            model_name = str(Path(flair.cache_root)  / cache_dir / 'direct' / 'final-model.pt')
+
+        if model_name == "de-historic-reported":
+            model_file = Path(flair.cache_root)  / cache_dir / 'reported' / 'final-model.pt'
+            if not model_file.exists():
+                cached_path('http://www.redewiedergabe.de/models/reported.zip', cache_dir=cache_dir)
+                unzip_file(Path(flair.cache_root)  / cache_dir / 'reported.zip', Path(flair.cache_root)  / cache_dir)
+            model_name = str(Path(flair.cache_root)  / cache_dir / 'reported' / 'final-model.pt')
+
+        if model_name == "de-historic-free-indirect":
+            model_file = Path(flair.cache_root)  / cache_dir / 'freeIndirect' / 'final-model.pt'
+            if not model_file.exists():
+                cached_path('http://www.redewiedergabe.de/models/freeIndirect.zip', cache_dir=cache_dir)
+                unzip_file(Path(flair.cache_root)  / cache_dir / 'freeIndirect.zip', Path(flair.cache_root)  / cache_dir)
+            model_name = str(Path(flair.cache_root)  / cache_dir / 'freeIndirect' / 'final-model.pt')
 
         return model_name
 

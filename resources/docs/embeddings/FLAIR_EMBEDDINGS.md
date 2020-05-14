@@ -40,6 +40,7 @@ Currently, the following contextual string embeddings are provided (note: replac
 | 'de-X'  | German  | Trained with mixed corpus (Web, Wikipedia, Subtitles) |
 | 'de-historic-ha-X'  | German (historical) | Added by [@stefan-it](https://github.com/stefan-it/flair-lms): Historical German trained over *Hamburger Anzeiger* |
 | 'de-historic-wz-X'  | German (historical) | Added by [@stefan-it](https://github.com/stefan-it/flair-lms): Historical German trained over *Wiener Zeitung* |
+| 'de-historic-rw-X'  | German (historical) | Added by [@redewiedergabe](https://github.com/redewiedergabe): Historical German trained over 100 million tokens |
 | 'es-X'    | Spanish | Added by [@iamyihwa](https://github.com/zalandoresearch/flair/issues/80): Trained with Wikipedia |
 | 'es-X-fast'    | Spanish | Added by [@iamyihwa](https://github.com/zalandoresearch/flair/issues/80): Trained with Wikipediam CPU-friendly |
 | 'eu-X'    | Basque | Added by [@stefan-it](https://github.com/zalandoresearch/flair/issues/614): Trained with Wikipedia/OPUS |
@@ -65,7 +66,9 @@ Currently, the following contextual string embeddings are provided (note: replac
 | 'sv-v0-X'    | Swedish | Added by [@stefan-it](https://github.com/stefan-it/flair-lms): Trained with various sources (Europarl, Wikipedia or OpenSubtitles2018) |
 | 'ta-X'    | Tamil | Added by [@stefan-it](https://github.com/stefan-it/plur) |
 | 'pubmed-X'    | English | Added by [@jessepeng](https://github.com/zalandoresearch/flair/pull/519): Trained with 5% of PubMed abstracts until 2015 (1150 hidden states, 3 layers)|
-
+| 'de-impresso-hipe-v1-X' | German (historical)  | In-domain data (Swiss and Luxembourgish newspapers) for [CLEF HIPE Shared task](https://impresso.github.io/CLEF-HIPE-2020). More information on the shared task can be found in [this paper](https://zenodo.org/record/3752679#.XqgzxXUzZzU) |
+| 'en-impresso-hipe-v1-X' | English (historical) | In-domain data (Chronicling America material) for [CLEF HIPE Shared task](https://impresso.github.io/CLEF-HIPE-2020). More information on the shared task can be found in [this paper](https://zenodo.org/record/3752679#.XqgzxXUzZzU) |
+| 'fr-impresso-hipe-v1-X' | French (historical)  | In-domain data (Swiss and Luxembourgish newspapers) for [CLEF HIPE Shared task](https://impresso.github.io/CLEF-HIPE-2020). More information on the shared task can be found in [this paper](https://zenodo.org/record/3752679#.XqgzxXUzZzU) |
 
 So, if you want to load embeddings from the German forward LM model, instantiate the method as follows:
 

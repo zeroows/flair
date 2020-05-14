@@ -507,6 +507,15 @@ class Sentence(DataPoint):
         if type(token) is str:
             token = Token(token)
 
+        token.text = token.text.replace('\u200c', '')
+        token.text = token.text.replace('\u200b', '')
+        token.text = token.text.replace('\ufe0f', '')
+        token.text = token.text.replace('\ufeff', '')
+
+        # data with zero-width characters cannot be handled
+        if token.text.strip() == '':
+            return
+
         self.tokens.append(token)
 
         # set token idx if not set
@@ -696,7 +705,7 @@ class Sentence(DataPoint):
             tags = iob_iobes(tags)
 
         for index, tag in enumerate(tags):
-            self.tokens[index].add_label(tag_type, tag)
+            self.tokens[index].set_label(tag_type, tag)
 
     def infer_space_after(self):
         """
@@ -736,7 +745,7 @@ class Sentence(DataPoint):
         str = ""
         pos = 0
         for t in self.tokens:
-            while t.start_pos != pos:
+            while t.start_pos > pos:
                 str += " "
                 pos += 1
 
@@ -934,11 +943,15 @@ class Corpus:
     def test(self) -> FlairDataset:
         return self._test
 
-    def downsample(self, percentage: float = 0.1, only_downsample_train=False):
+    def downsample(self, percentage: float = 0.1, downsample_train=True, downsample_dev=True, downsample_test=True):
 
-        self._train = self._downsample_to_proportion(self.train, percentage)
-        if not only_downsample_train:
+        if downsample_train:
+            self._train = self._downsample_to_proportion(self.train, percentage)
+
+        if downsample_dev:
             self._dev = self._downsample_to_proportion(self.dev, percentage)
+
+        if downsample_test:
             self._test = self._downsample_to_proportion(self.test, percentage)
 
         return self
@@ -1104,7 +1117,8 @@ class Corpus:
 
         from flair.datasets import DataLoader
 
-        loader = DataLoader(self.train, batch_size=1)
+        data = ConcatDataset([self.train, self.test])
+        loader = DataLoader(data, batch_size=1)
 
         log.info("Computing label dictionary. Progress:")
         for batch in Tqdm.tqdm(iter(loader)):
